@@ -108,13 +108,13 @@ const jsonLd = {
             </a>
           </nav>
         </div>
-        <div class="relative lg:col-span-5">
+        <div class="relative -mx-6 sm:-mx-10 lg:col-span-5 lg:mx-0">
           <img
             src={d.portrait}
             alt={`Portrait of ${d.name}`}
             width="880"
             height="1100"
-            class="h-full max-h-[42rem] w-full object-cover object-top [filter:saturate(0.96)]"
+            class="aspect-[4/5] w-full object-cover object-top [filter:saturate(0.96)] sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:max-h-[42rem]"
             loading="eager"
             fetchpriority="high"
           />
