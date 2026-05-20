@@ -29,6 +29,12 @@ const t = useTranslations(lang);
     <meta name="theme-color" content="#FAF8F4" />
     <meta name="generator" content={Astro.generator} />
     <Seo title={title} description={description} image={image} noindex={noindex} jsonLd={jsonLd} />
+    <script is:inline>
+      // Mark the document as JS-enabled before paint so the .reveal
+      // scroll-fade effect activates. Without this class, .reveal stays
+      // fully visible — content is never gated on JS.
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body class="flex min-h-screen flex-col">
     <a href="#main" class="skip-link">{t('a11y.skip')}</a>
@@ -41,8 +47,10 @@ const t = useTranslations(lang);
     <script>
       const els = document.querySelectorAll<HTMLElement>('.reveal');
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const showAll = () => els.forEach((el) => el.classList.add('is-visible'));
+
       if (reduce || !('IntersectionObserver' in window)) {
-        els.forEach((el) => el.classList.add('is-visible'));
+        showAll();
       } else {
         const io = new IntersectionObserver(
           (entries) => {
@@ -56,6 +64,10 @@ const t = useTranslations(lang);
           { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
         );
         els.forEach((el) => io.observe(el));
+        // Safety net: any .reveal that hasn't fired after 2.5s gets shown
+        // unconditionally, so content is never permanently hidden by a
+        // missed observer event.
+        setTimeout(showAll, 2500);
       }
     </script>
   </body>

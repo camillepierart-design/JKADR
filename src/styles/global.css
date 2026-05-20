@@ -122,8 +122,11 @@
 }
 
 @layer utilities {
-  /* Subtle scroll-reveal: fade + small rise, 600ms, soft easing. */
-  .reveal {
+  /* Subtle scroll-reveal: fade + small rise, 600ms, soft easing.
+     Guarded by a `js` class on <html> so content stays fully visible if JS
+     fails, is blocked, or the IntersectionObserver doesn't fire — the
+     animation is a progressive enhancement, never a gate to readability. */
+  .js .reveal {
     opacity: 0;
     transform: translateY(14px);
     transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
@@ -131,13 +134,13 @@
     will-change: opacity, transform;
   }
 
-  .reveal.is-visible {
+  .js .reveal.is-visible {
     opacity: 1;
     transform: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .reveal {
+    .js .reveal {
       opacity: 1;
       transform: none;
       transition: none;
