@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHero from '@components/PageHero.astro';
+import TeamCard from '@components/TeamCard.astro';
+import { getLangFromUrl, localize, useTranslations } from '../../i18n';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const team = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title={t('team.title')}
+  description="Prof. Dr. Jan Kleinheisterkamp works with a small team of experienced tribunal secretaries and counsel: Carolina Pitta e Cunha, Benedita Sampaio Nunes and Shaurya Upadhyay."
+>
+  <PageHero
+    index="02"
+    eyebrow={t('team.eyebrow')}
+    title={t('team.title')}
+    lede={t('team.lede')}
+    image="/images/header-team.jpg"
+  />
+  <section class="shell py-section lg:py-section-lg">
+    <div class="grid gap-x-10 gap-y-16 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        team.map((m, i) => (
+          <TeamCard
+            name={m.data.name.replace('Prof. Dr. ', '')}
+            role={m.data.role}
+            portrait={m.data.portrait}
+            href={localize(lang, `/team/${m.slug}`)}
+            index={String(i + 1).padStart(2, '0')}
+          />
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

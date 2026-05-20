@@ -1,0 +1,159 @@
+---
+import { type CollectionEntry } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Timeline from '@components/Timeline.astro';
+import { site } from '@data/site';
+import { getLangFromUrl, localize, useTranslations } from '../../i18n';
+
+interface Props {
+  member: CollectionEntry<'team'>;
+  prev: CollectionEntry<'team'>;
+  next: CollectionEntry<'team'>;
+}
+
+const { member, prev, next } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const { Content } = await member.render();
+const d = member.data;
+const displayName = d.name.replace('Prof. Dr. ', '');
+const shortName = (m: CollectionEntry<'team'>) =>
+  m.data.name.replace('Prof. Dr. ', '').split(' ')[0];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: displayName,
+  jobTitle: d.role,
+  description: d.intro,
+  url: `${site.url}${localize(lang, `/team/${member.slug}`)}`,
+  worksFor: { '@type': 'LegalService', name: site.fullName, url: site.url },
+};
+---
+
+<BaseLayout title={displayName} description={d.intro} jsonLd={jsonLd} headerVariant="overlay">
+  <section class="relative bg-[#100f0d]">
+    <div class="shell">
+      <div class="grid items-stretch lg:grid-cols-12">
+        <div class="flex flex-col justify-center py-24 pt-32 lg:col-span-7 lg:py-32 lg:pt-40 lg:pr-12">
+          <a
+            href={localize(lang, '/team')}
+            class="font-sans text-meta uppercase tracking-eyebrow text-night-soft transition-colors duration-300 hover:text-bordeaux-light"
+            >&larr;&nbsp;&nbsp;{t('profile.backTeam')}</a
+          >
+          <h1 class="reveal mt-10 text-display-lg text-paper">{d.name}</h1>
+          <p class="reveal mt-6 font-sans text-meta uppercase tracking-eyebrow text-bordeaux-light">
+            {d.role}
+          </p>
+          <div class="reveal mt-12 flex flex-wrap items-center gap-x-12 gap-y-6 border-t border-night-line pt-8">
+            {
+              d.languages && (
+                <div>
+                  <p class="font-sans text-[0.7rem] uppercase tracking-eyebrow text-night-soft/70">
+                    {t('profile.languages')}
+                  </p>
+                  <p class="mt-2 text-body text-paper/90">{d.languages.join(' · ')}</p>
+                </div>
+              )
+            }
+            {
+              d.cv && (
+                <a
+                  href={d.cv}
+                  class="font-sans text-meta uppercase tracking-eyebrow text-night-soft transition-colors duration-300 hover:text-paper"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {t('cta.downloadCv')} &nearr;
+                </a>
+              )
+            }
+          </div>
+
+          <nav
+            class="reveal mt-14 flex items-center justify-between gap-6 border-t border-night-line pt-7"
+            aria-label={t('profile.aside')}
+          >
+            <a href={localize(lang, `/team/${prev.slug}`)} class="group flex items-center gap-3 text-left" rel="prev">
+              <span
+                aria-hidden="true"
+                class="text-lg text-night-soft transition-colors duration-300 group-hover:text-bordeaux-light"
+                >&larr;</span
+              >
+              <span>
+                <span class="block font-sans text-[0.66rem] uppercase tracking-eyebrow text-night-soft/60"
+                  >{t('profile.prev')}</span
+                >
+                <span
+                  class="mt-1 block font-sans text-meta uppercase tracking-eyebrow text-night-soft transition-colors duration-300 group-hover:text-paper"
+                  >{shortName(prev)}</span
+                >
+              </span>
+            </a>
+            <a href={localize(lang, `/team/${next.slug}`)} class="group flex items-center gap-3 text-right" rel="next">
+              <span>
+                <span class="block font-sans text-[0.66rem] uppercase tracking-eyebrow text-night-soft/60"
+                  >{t('profile.next')}</span
+                >
+                <span
+                  class="mt-1 block font-sans text-meta uppercase tracking-eyebrow text-night-soft transition-colors duration-300 group-hover:text-paper"
+                  >{shortName(next)}</span
+                >
+              </span>
+              <span
+                aria-hidden="true"
+                class="text-lg text-night-soft transition-colors duration-300 group-hover:text-bordeaux-light"
+                >&rarr;</span
+              >
+            </a>
+          </nav>
+        </div>
+        <div class="relative lg:col-span-5">
+          <img
+            src={d.portrait}
+            alt={`Portrait of ${d.name}`}
+            width="880"
+            height="1100"
+            class="h-full max-h-[42rem] w-full object-cover object-top [filter:saturate(0.96)]"
+            loading="eager"
+            fetchpriority="high"
+          />
+          <div
+            class="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-[#100f0d] via-transparent to-transparent lg:block"
+          >
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    d.strip && (
+      <div
+        class="h-12 w-full border-b border-ink-line bg-cover bg-center lg:h-16"
+        style={`background-image:url(${d.strip})`}
+        role="img"
+        aria-label={`Decorative band — ${displayName}`}
+      />
+    )
+  }
+
+  <article class="shell py-section lg:py-section-lg">
+    <div class="grid gap-y-10 lg:grid-cols-12 lg:gap-x-16">
+      <div class="lg:col-span-3">
+        <p class="font-sans text-meta uppercase tracking-eyebrow text-ink-soft lg:sticky lg:top-32">
+          {t('profile.aside')}
+        </p>
+      </div>
+      <div class="reveal lg:col-span-9">
+        <p class="max-w-measure-lg font-display text-[1.5rem] leading-snug text-ink lg:text-[1.7rem]">
+          {d.intro}
+        </p>
+        <div class="prose prose-editorial mt-12">
+          <Content />
+        </div>
+        {d.timeline && d.timeline.length > 0 && <Timeline items={d.timeline} />}
+      </div>
+    </div>
+  </article>
+</BaseLayout>

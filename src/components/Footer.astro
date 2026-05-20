@@ -1,0 +1,92 @@
+---
+import { nav, site } from '@data/site';
+import { getLangFromUrl, localize, useTranslations } from '../i18n';
+const year = new Date().getFullYear();
+const secondary = nav.filter((n) => n.href !== '/');
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<footer class="mt-section-lg bg-night text-night-soft">
+  <div class="shell py-20 lg:py-28">
+    <div class="grid gap-14 md:grid-cols-12 md:gap-10">
+      <div class="md:col-span-5">
+        <img
+          src="/images/logo-mark-white.png"
+          alt=""
+          aria-hidden="true"
+          width="120"
+          height="74"
+          class="h-12 w-auto opacity-90"
+        />
+        <p
+          class="mt-6 font-display text-2xl text-paper"
+          style="font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 0;"
+        >
+          Kleinheisterkamp
+        </p>
+        <p class="mt-2 font-sans text-meta uppercase tracking-eyebrow text-night-soft">
+          {t('site.sub')}
+        </p>
+        <address class="mt-8 space-y-0.5 text-[0.95rem] not-italic leading-relaxed">
+          <span class="block">{site.address.building}</span>
+          <span class="block">{site.address.street}</span>
+          <span class="block">{site.address.city}</span>
+          <span class="block">{site.address.country}</span>
+        </address>
+      </div>
+
+      <nav class="md:col-span-3" aria-label={t('footer.pages')}>
+        <p class="font-sans text-meta uppercase tracking-eyebrow text-night-soft/70">{t('footer.pages')}</p>
+        <ul class="mt-6 space-y-3 text-[0.95rem]">
+          {
+            secondary.map((item) => (
+              <li>
+                <a
+                  class="text-night-soft transition-colors duration-300 hover:text-paper"
+                  href={localize(lang, item.href)}
+                >
+                  {t(item.key)}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="md:col-span-4">
+        <p class="font-sans text-meta uppercase tracking-eyebrow text-night-soft/70">{t('footer.contact')}</p>
+        <ul class="mt-6 space-y-3 text-[0.95rem]">
+          <li>
+            <a class="text-night-soft transition-colors duration-300 hover:text-paper" href={`mailto:${site.email}`}>
+              {site.email}
+            </a>
+          </li>
+          <li>
+            <a class="text-night-soft transition-colors duration-300 hover:text-paper" href={`tel:${site.phoneHref}`}>
+              {site.phone}
+            </a>
+          </li>
+          <li class="text-night-soft/70">BCE/VAT&nbsp;&nbsp;{site.vat}</li>
+        </ul>
+        <p class="mt-8">
+          <a
+            class="font-sans text-meta uppercase tracking-eyebrow text-night-soft transition-colors duration-300 hover:text-paper"
+            href={site.legalUrl}
+            rel="noopener"
+          >
+            {t('footer.legal')}
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <hr class="mt-20 border-0 border-t border-night-line" />
+    <div
+      class="mt-6 flex flex-col gap-2 font-sans text-[0.78rem] text-night-soft/60 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>&copy; {year} Prof. Dr. Jan Kleinheisterkamp. {t('footer.rights')}</p>
+      <p class="tracking-wide">{t('footer.brussels')}</p>
+    </div>
+  </div>
+</footer>

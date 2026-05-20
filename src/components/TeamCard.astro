@@ -1,0 +1,56 @@
+---
+interface Props {
+  name: string;
+  role: string;
+  portrait: string;
+  href: string;
+  index?: string;
+  dark?: boolean;
+}
+import { getLangFromUrl, useTranslations } from '../i18n';
+const { name, role, portrait, href, index, dark = false } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<article class="reveal group">
+  <a href={href} class="block" aria-label={`${name} — ${t('cta.readProfile')}`}>
+    <div class:list={['overflow-hidden', dark ? 'bg-night' : 'bg-paper-deep']}>
+      <img
+        src={portrait}
+        alt={`Portrait of ${name}`}
+        width="640"
+        height="800"
+        loading="lazy"
+        class="aspect-[4/5] w-full object-cover object-top [filter:saturate(0.95)] transition-[filter,transform] duration-700 ease-editorial group-hover:[filter:saturate(1.05)]"
+      />
+    </div>
+    <div class="mt-6 flex items-baseline gap-3">
+      {
+        index && (
+          <span class:list={['font-sans text-meta tabular-nums', dark ? 'text-bordeaux-light' : 'text-bordeaux']}>
+            {index}
+          </span>
+        )
+      }
+      <div>
+        <h3
+          class:list={[
+            'font-display text-[1.4rem] leading-tight transition-colors duration-300',
+            dark ? 'text-paper group-hover:text-bordeaux-light' : 'text-ink group-hover:text-bordeaux',
+          ]}
+          style="font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 0;"
+        >
+          {name}
+        </h3>
+        <p
+          class:list={[
+            'mt-2 font-sans text-meta uppercase tracking-eyebrow',
+            dark ? 'text-night-soft' : 'text-ink-soft',
+          ]}
+        >
+          {role}
+        </p>
+      </div>
+    </div>
+  </a>
+</article>

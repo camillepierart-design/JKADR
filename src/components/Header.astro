@@ -1,0 +1,202 @@
+---
+import { nav, site } from '@data/site';
+import LangSwitcher from './LangSwitcher.astro';
+import { getLangFromUrl, canonicalPath, localize, useTranslations } from '../i18n';
+
+interface Props {
+  variant?: 'overlay' | 'solid';
+}
+const { variant = 'solid' } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const path = canonicalPath(Astro.url.pathname);
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
+---
+
+<header
+  id="site-header"
+  data-variant={variant}
+  class:list={[
+    'fixed inset-x-0 top-0 z-40 transition-colors duration-500 ease-editorial',
+    variant === 'overlay'
+      ? 'bg-transparent text-paper'
+      : 'border-b border-ink-line bg-paper/95 text-ink backdrop-blur',
+  ]}
+>
+  <div class="shell flex h-[4.75rem] items-center justify-between gap-8 lg:h-[5.5rem]">
+    <a href={localize(lang, '/')} class="group -my-2 flex items-center gap-3 py-2 lg:gap-4" aria-label={`${site.fullName} — ${t('nav.home')}`}>
+      <span class="relative block h-8 w-[3.4rem] shrink-0 lg:h-9 lg:w-[3.8rem]">
+        <img
+          src="/images/logo-mark-white.png"
+          alt=""
+          aria-hidden="true"
+          data-mark-light
+          class="absolute inset-0 h-full w-full object-contain"
+        />
+        <img
+          src="/images/logo-mark.png"
+          alt=""
+          aria-hidden="true"
+          data-mark-dark
+          class="absolute inset-0 h-full w-full object-contain opacity-0"
+        />
+      </span>
+      <span class="block">
+        <span
+          class="block font-display text-[1.0625rem] font-medium leading-none tracking-tight transition-colors lg:text-[1.15rem]"
+          style="font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 0;"
+        >
+          Kleinheisterkamp
+        </span>
+        <span
+          data-sub
+          class="mt-1.5 block font-sans text-[0.625rem] uppercase tracking-eyebrow opacity-65"
+        >
+          {t('site.sub')}
+        </span>
+      </span>
+    </a>
+
+    <div class="hidden items-center gap-8 lg:flex">
+      <nav aria-label={t('a11y.primaryNav')}>
+        <ul class="flex items-center gap-8">
+          {
+            nav.map((item) => (
+              <li>
+                <a
+                  href={localize(lang, item.href)}
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                  class="nav-link-h"
+                >
+                  {t(item.key)}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <span class="h-4 w-px bg-current opacity-20"></span>
+      <LangSwitcher />
+    </div>
+
+    <button
+      type="button"
+      id="menu-toggle"
+      class="-mr-2 inline-flex h-11 w-11 items-center justify-center lg:hidden"
+      aria-label={t('a11y.openMenu')}
+      data-open={t('a11y.openMenu')}
+      data-close={t('a11y.closeMenu')}
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <span class="relative block h-3 w-6">
+        <span class="absolute left-0 top-0 h-px w-full bg-current"></span>
+        <span class="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-current"></span>
+        <span class="absolute bottom-0 left-0 h-px w-full bg-current"></span>
+      </span>
+    </button>
+  </div>
+
+  <div id="mobile-menu" hidden class="border-t border-ink-line bg-paper text-ink lg:hidden">
+    <nav class="shell py-6" aria-label="Mobile">
+      <ul class="flex flex-col">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={localize(lang, item.href)}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                class:list={[
+                  'block border-b border-ink-line py-4 font-display text-xl',
+                  isActive(item.href) ? 'text-bordeaux' : 'text-ink',
+                ]}
+              >
+                {t(item.key)}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="pt-6 text-ink">
+        <LangSwitcher />
+      </div>
+    </nav>
+  </div>
+</header>
+<div data-header-spacer class:list={[variant === 'overlay' ? 'hidden' : 'h-[4.75rem] lg:h-[5.5rem]']}></div>
+
+<style>
+  .nav-link-h {
+    position: relative;
+    font-family: '"Inter Variable"', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    color: currentColor;
+    opacity: 0.72;
+    transition: opacity 0.3s ease;
+  }
+  .nav-link-h:hover {
+    opacity: 1;
+  }
+  .nav-link-h[aria-current='page'] {
+    opacity: 1;
+  }
+  .nav-link-h[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.5rem;
+    height: 1px;
+    width: 100%;
+    background: #6b1f1f;
+  }
+  #site-header[data-solid] {
+    background-color: rgba(250, 248, 244, 0.95);
+    color: #1a1a1a;
+    border-bottom: 1px solid #dcd6c9;
+    backdrop-filter: blur(8px);
+  }
+  #site-header[data-solid] [data-sub] {
+    opacity: 0.55;
+  }
+  /* Logo mark swaps with the header tone */
+  #site-header[data-variant='solid'] [data-mark-light],
+  #site-header[data-solid] [data-mark-light] {
+    opacity: 0;
+  }
+  #site-header[data-variant='solid'] [data-mark-dark],
+  #site-header[data-solid] [data-mark-dark] {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  const header = document.getElementById('site-header');
+  const overlay = header?.dataset.variant === 'overlay';
+  if (overlay) {
+    const onScroll = () => {
+      if (window.scrollY > 24) header?.setAttribute('data-solid', '');
+      else header?.removeAttribute('data-solid');
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  toggle?.addEventListener('click', () => {
+    const closed = menu?.hasAttribute('hidden');
+    if (closed) {
+      menu?.removeAttribute('hidden');
+      header?.setAttribute('data-solid', '');
+      toggle?.setAttribute('aria-expanded', 'true');
+      if (toggle?.dataset.close) toggle.setAttribute('aria-label', toggle.dataset.close);
+    } else {
+      menu?.setAttribute('hidden', '');
+      if (overlay && window.scrollY <= 24) header?.removeAttribute('data-solid');
+      toggle?.setAttribute('aria-expanded', 'false');
+      if (toggle?.dataset.open) toggle.setAttribute('aria-label', toggle.dataset.open);
+    }
+  });
+</script>

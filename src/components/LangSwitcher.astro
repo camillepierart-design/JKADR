@@ -1,0 +1,28 @@
+---
+import { languages, getLangFromUrl, altHref, type Lang } from '../i18n';
+const current = getLangFromUrl(Astro.url);
+---
+
+<div class="flex items-center gap-2 font-sans text-[0.78rem]">
+  {
+    (Object.keys(languages) as Lang[]).map((lng, i) => (
+      <>
+        {i > 0 && <span aria-hidden="true" class="opacity-30">/</span>}
+        {lng === current ? (
+          <span aria-current="true" class="font-medium opacity-100">
+            {languages[lng]}
+          </span>
+        ) : (
+          <a
+            href={altHref(Astro.url, lng)}
+            hreflang={lng}
+            aria-label={lng === 'fr' ? 'Lire cette page en français' : 'Read this page in English'}
+            class="opacity-55 transition-opacity duration-300 hover:opacity-100"
+          >
+            {languages[lng]}
+          </a>
+        )}
+      </>
+    ))
+  }
+</div>

@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import TeamProfileView from '@components/views/TeamProfileView.astro';
+
+export async function getStaticPaths() {
+  const team = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
+  return team.map((m, i) => ({
+    params: { slug: m.slug },
+    props: {
+      member: m,
+      prev: team[(i - 1 + team.length) % team.length],
+      next: team[(i + 1) % team.length],
+    },
+  }));
+}
+
+const { member, prev, next } = Astro.props;
+---
+
+<TeamProfileView member={member} prev={prev} next={next} />

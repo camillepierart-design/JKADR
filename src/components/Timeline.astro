@@ -1,0 +1,33 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n';
+interface Props {
+  items: { year: string; text: string }[];
+}
+const { items } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<section class="mt-20 border-t border-ink-line pt-16 lg:mt-24 lg:pt-20">
+  <p class="eyebrow"><span class="eyebrow-num">∗</span> {t('profile.career')}</p>
+  <ol class="mt-12 lg:mt-16">
+    {
+      items.map((item) => (
+        <li class="reveal grid grid-cols-1 gap-x-12 gap-y-3 border-l border-ink-line pb-12 pl-8 last:pb-0 sm:grid-cols-[8rem_1fr] sm:pl-12">
+          <div class="relative">
+            <span
+              class="absolute -left-[2.05rem] top-2 hidden h-px w-6 bg-bordeaux sm:block lg:-left-[3.05rem]"
+              aria-hidden="true"
+            />
+            <span
+              class="font-display text-[1.6rem] leading-none text-bordeaux"
+              style="font-variation-settings:'opsz' 144,'SOFT' 0,'WONK' 0;"
+            >
+              {item.year}
+            </span>
+          </div>
+          <p class="max-w-measure text-body leading-relaxed text-ink-muted">{item.text}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>

@@ -1,0 +1,98 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHero from '@components/PageHero.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const pub = await getEntry('lists', 'publications');
+const spk = await getEntry('lists', 'speaking');
+const { Content: Publications } = await pub.render();
+const { Content: Speaking } = await spk.render();
+---
+
+<BaseLayout title={t('pubs.title')} description={pub.data.description}>
+  <PageHero
+    index="05"
+    eyebrow={t('pubs.eyebrow')}
+    title={t('pubs.title')}
+    lede={t('pubs.lede')}
+    image="/images/header-scholarship.jpg"
+  />
+
+  <div class="sticky top-[4.75rem] z-20 border-b border-ink-line bg-paper/95 backdrop-blur lg:top-[5.5rem]">
+    <nav class="shell flex gap-10 py-4 font-sans text-meta uppercase tracking-eyebrow" aria-label={t('pubs.title')}>
+      <a class="link-quiet text-ink-soft" href="#publications">{t('pubs.publications')}</a>
+      <a class="link-quiet text-ink-soft" href="#speaking">{t('pubs.speaking')}</a>
+    </nav>
+  </div>
+
+  <article class="shell py-section lg:py-section-lg">
+    <section id="publications" class="biblio scroll-mt-40">
+      <Publications />
+    </section>
+    <section id="speaking" class="biblio mt-32 scroll-mt-40 border-t border-ink-line pt-24">
+      <Speaking />
+    </section>
+  </article>
+</BaseLayout>
+
+<style is:global>
+  .biblio {
+    max-width: 46rem;
+  }
+  .biblio > h2:first-child {
+    margin-top: 0;
+  }
+  .biblio h2 {
+    font-family: '"Fraunces Variable"', Georgia, serif;
+    font-size: 1.9rem;
+    letter-spacing: -0.018em;
+    color: #1a1a1a;
+    margin: 4.5rem 0 0;
+  }
+  .biblio h3 {
+    font-family: '"Fraunces Variable"', Georgia, serif;
+    font-size: 1.6rem;
+    color: #1a1a1a;
+    margin: 4rem 0 0;
+  }
+  .biblio ul {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+  }
+  .biblio li {
+    position: relative;
+    padding: 1.05rem 0 1.05rem 1.6rem;
+    border-bottom: 1px solid #ece7da;
+    color: #46433e;
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  .biblio li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1.55rem;
+    width: 0.5rem;
+    height: 1px;
+    background: #c9a6a6;
+  }
+  .biblio li:last-child {
+    border-bottom: 0;
+  }
+  .biblio a {
+    color: #6b1f1f;
+    text-decoration: none;
+    background-image: linear-gradient(#6b1f1f, #6b1f1f);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    transition: background-size 0.3s ease;
+  }
+  .biblio a:hover {
+    background-size: 100% 1.5px;
+  }
+</style>

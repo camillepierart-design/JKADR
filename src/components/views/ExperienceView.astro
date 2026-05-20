@@ -1,0 +1,86 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHero from '@components/PageHero.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const entry = await getEntry('lists', 'experience');
+const { Content } = await entry.render();
+---
+
+<BaseLayout title={t('experience.title')} description={entry.data.description}>
+  <PageHero
+    index="04"
+    eyebrow={t('experience.eyebrow')}
+    title={t('experience.title')}
+    lede={t('experience.lede')}
+    image="/images/header-experience.jpg"
+  />
+  <article class="shell py-section lg:py-section-lg">
+    <div class="exp mx-auto max-w-measure-lg">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style is:global>
+  .exp h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .exp h3 {
+    font-family: '"Fraunces Variable"', Georgia, serif;
+    font-size: 2rem;
+    letter-spacing: -0.018em;
+    color: #1a1a1a;
+    margin-bottom: 3.5rem;
+  }
+  .exp h4 {
+    font-family: '"Inter Variable"', system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #6b1f1f;
+    margin-top: 4.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid #dcd6c9;
+  }
+  .exp h4:first-of-type {
+    margin-top: 0;
+  }
+  .exp ul {
+    list-style: none;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    counter-reset: matter;
+  }
+  .exp li {
+    counter-increment: matter;
+    position: relative;
+    padding: 1.15rem 0 1.15rem 3.25rem;
+    border-bottom: 1px solid #ece7da;
+    color: #46433e;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+  .exp li::before {
+    content: counter(matter, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 1.25rem;
+    font-family: '"Inter Variable"', system-ui, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    color: #9c9486;
+  }
+  .exp li:last-child {
+    border-bottom: 0;
+  }
+</style>

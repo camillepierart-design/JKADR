@@ -1,0 +1,35 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHero from '@components/PageHero.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const entry = await getEntry('pages', 'about');
+const { Content } = await entry.render();
+---
+
+<BaseLayout title={t('about.title')} description={entry.data.description}>
+  <PageHero
+    index="01"
+    eyebrow={t('about.eyebrow')}
+    title={t('about.title')}
+    lede={t('site.tagline')}
+    image="/images/header-about.jpg"
+  />
+  <article class="shell py-section lg:py-section-lg">
+    <div class="grid gap-y-10 lg:grid-cols-12 lg:gap-x-16">
+      <div class="lg:col-span-3">
+        <p class="font-sans text-meta uppercase tracking-eyebrow text-ink-soft lg:sticky lg:top-32">
+          {t('about.aside')}
+        </p>
+      </div>
+      <div class="reveal lg:col-span-9">
+        <div class="prose prose-editorial">
+          <Content />
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

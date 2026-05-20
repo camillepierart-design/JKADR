@@ -1,0 +1,17 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { getLangFromUrl, localize, useTranslations } from '../../i18n';
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title={t('nf.eyebrow')} noindex={true}>
+  <section class="shell flex min-h-[64vh] flex-col justify-center py-section">
+    <p class="font-sans text-meta uppercase tracking-eyebrow text-bordeaux">{t('nf.eyebrow')}</p>
+    <h1 class="mt-8 max-w-measure-lg text-display-lg text-ink">{t('nf.title')}</h1>
+    <p class="mt-6 max-w-measure text-body-lg text-ink-muted">{t('nf.body')}</p>
+    <div>
+      <a href={localize(lang, '/')} class="btn mt-12">{t('cta.backHome')}</a>
+    </div>
+  </section>
+</BaseLayout>

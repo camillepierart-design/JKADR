@@ -1,0 +1,45 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHero from '@components/PageHero.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const entry = await getEntry('pages', 'practice');
+const { Content } = await entry.render();
+---
+
+<BaseLayout title={t('practice.title')} description={entry.data.description}>
+  <PageHero
+    index="03"
+    eyebrow={t('practice.eyebrow')}
+    title={t('practice.title')}
+    lede={t('practice.lede')}
+    image="/images/header-practice.jpg"
+  />
+  <article class="shell py-section lg:py-section-lg">
+    <div class="grid gap-y-10 lg:grid-cols-12 lg:gap-x-16">
+      <div class="lg:col-span-3">
+        <nav
+          class="font-sans text-meta uppercase tracking-eyebrow text-ink-soft lg:sticky lg:top-32"
+          aria-label={t('practice.title')}
+        >
+          <ul class="space-y-3">
+            <li><a class="link-quiet" href="#arbitration">{t('home.arbHeading')}</a></li>
+            <li><a class="link-quiet" href="#mediation">{t('home.medHeading')}</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="reveal lg:col-span-9">
+        <div
+          class="prose prose-editorial
+            prose-h2:mt-0 prose-h2:scroll-mt-32 prose-h2:text-display-sm
+            [&_h2:not(:first-child)]:mt-24 [&_h2:not(:first-child)]:border-t [&_h2:not(:first-child)]:border-ink-line [&_h2:not(:first-child)]:pt-20"
+        >
+          <Content />
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

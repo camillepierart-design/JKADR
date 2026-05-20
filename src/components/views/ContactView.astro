@@ -1,0 +1,155 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHero from '@components/PageHero.astro';
+import { site } from '@data/site';
+import { getLangFromUrl, useTranslations } from '../../i18n';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// To use Formspree instead of the mailto fallback, set this to your
+// endpoint, e.g. 'https://formspree.io/f/xxxxxxx'. Leave empty for mailto.
+const FORMSPREE_ENDPOINT = '';
+const mapsQuery = encodeURIComponent(
+  `${site.address.street}, ${site.address.city}, ${site.address.country}`
+);
+const fieldClass =
+  'mt-3 w-full border-0 border-b border-ink-line bg-transparent pb-3 font-sans text-body text-ink placeholder:text-ink-soft/60 focus:border-bordeaux focus:outline-none focus:ring-0';
+---
+
+<BaseLayout
+  title={t('contact.title')}
+  description={`Contact Prof. Dr. Jan Kleinheisterkamp — ${site.address.street}, ${site.address.city}, ${site.address.country}.`}
+>
+  <PageHero
+    index="06"
+    eyebrow={t('contact.eyebrow')}
+    title={t('contact.title')}
+    lede={t('contact.lede')}
+    image="/images/header-contact.jpg"
+  />
+
+  <section class="shell py-section lg:py-section-lg">
+    <div class="grid gap-y-16 lg:grid-cols-12 lg:gap-x-16">
+      <div class="lg:col-span-5">
+        <p class="font-sans text-meta uppercase tracking-eyebrow text-ink-soft">{t('contact.office')}</p>
+        <address class="mt-7 space-y-1 text-body-lg not-italic leading-relaxed text-ink">
+          <span class="block font-display text-display-sm">{site.fullName}</span>
+          <span class="block pt-3 text-ink-muted">{site.address.building}</span>
+          <span class="block text-ink-muted">{site.address.street}</span>
+          <span class="block text-ink-muted">{site.address.city}</span>
+          <span class="block text-ink-muted">{site.address.country}</span>
+        </address>
+
+        <dl class="mt-10 space-y-5 border-t border-ink-line pt-8 text-body">
+          <div class="flex gap-6">
+            <dt class="w-16 shrink-0 font-sans text-meta uppercase tracking-eyebrow text-ink-soft">
+              {t('contact.email')}
+            </dt>
+            <dd><a class="link-quiet" href={`mailto:${site.email}`}>{site.email}</a></dd>
+          </div>
+          <div class="flex gap-6">
+            <dt class="w-16 shrink-0 font-sans text-meta uppercase tracking-eyebrow text-ink-soft">
+              {t('contact.tel')}
+            </dt>
+            <dd><a class="link-quiet" href={`tel:${site.phoneHref}`}>{site.phone}</a></dd>
+          </div>
+          <div class="flex gap-6">
+            <dt class="w-16 shrink-0 font-sans text-meta uppercase tracking-eyebrow text-ink-soft">
+              {t('contact.vat')}
+            </dt>
+            <dd class="text-ink-muted">{site.vat}</dd>
+          </div>
+        </dl>
+
+        <a
+          href={`https://www.openstreetmap.org/search?query=${mapsQuery}`}
+          target="_blank"
+          rel="noopener"
+          class="link-quiet mt-10 inline-block font-sans text-meta uppercase tracking-eyebrow"
+        >
+          {t('cta.viewMap')}
+        </a>
+      </div>
+
+      <div class="reveal lg:col-span-7 lg:border-l lg:border-ink-line lg:pl-16">
+        <p class="font-sans text-meta uppercase tracking-eyebrow text-ink-soft">{t('contact.sendTitle')}</p>
+        <form
+          id="contact-form"
+          class="mt-10 space-y-10"
+          method="POST"
+          data-endpoint={FORMSPREE_ENDPOINT}
+          data-email={site.email}
+          data-subject={t('contact.mailSubject')}
+          data-msg-sending={t('contact.sending')}
+          data-msg-sent={t('contact.sent')}
+          data-msg-error={t('contact.error')}
+          data-msg-opening={t('contact.opening')}
+        >
+          <div>
+            <label for="name" class="font-sans text-meta uppercase tracking-eyebrow text-ink-soft"
+              >{t('contact.name')}</label
+            >
+            <input id="name" name="name" type="text" required class={fieldClass} />
+          </div>
+          <div>
+            <label for="email" class="font-sans text-meta uppercase tracking-eyebrow text-ink-soft"
+              >{t('contact.email')}</label
+            >
+            <input id="email" name="email" type="email" required class={fieldClass} />
+          </div>
+          <div>
+            <label for="message" class="font-sans text-meta uppercase tracking-eyebrow text-ink-soft"
+              >{t('contact.message')}</label
+            >
+            <textarea id="message" name="message" rows="5" required class={fieldClass}></textarea>
+          </div>
+          <div class="flex flex-wrap items-center gap-6">
+            <button type="submit" class="btn">{t('cta.sendMessage')}</button>
+            <p id="form-status" class="font-sans text-sm text-ink-soft" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const form = document.getElementById('contact-form') as HTMLFormElement | null;
+    const status = document.getElementById('form-status');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const name = String(data.get('name') ?? '');
+      const email = String(data.get('email') ?? '');
+      const message = String(data.get('message') ?? '');
+      const endpoint = form.dataset.endpoint;
+      const M = form.dataset;
+
+      if (endpoint) {
+        try {
+          if (status && M.msgSending) status.textContent = M.msgSending;
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            body: data,
+          });
+          if (res.ok) {
+            form.reset();
+            if (status && M.msgSent) status.textContent = M.msgSent;
+          } else {
+            if (status && M.msgError) status.textContent = M.msgError;
+          }
+        } catch {
+          if (status && M.msgError) status.textContent = M.msgError;
+        }
+        return;
+      }
+
+      const to = form.dataset.email ?? '';
+      const subject = encodeURIComponent(`${M.subject ?? 'Website enquiry'} — ${name}`);
+      const body = encodeURIComponent(`${message}\n\n— ${name}\n${email}`);
+      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+      if (status && M.msgOpening) status.textContent = M.msgOpening;
+    });
+  </script>
+</BaseLayout>

@@ -1,0 +1,59 @@
+---
+interface Props {
+  index?: string;
+  eyebrow: string;
+  title: string;
+  lede?: string;
+  image?: string;
+}
+const { index, eyebrow, title, lede, image } = Astro.props;
+---
+
+{
+  image ? (
+    <section class="relative">
+      <div class="relative h-[58vh] min-h-[26rem] w-full overflow-hidden bg-paper-deep">
+        <img
+          src={image}
+          alt=""
+          aria-hidden="true"
+          class="h-full w-full object-cover [filter:saturate(0.82)_contrast(0.96)_brightness(1.02)]"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <div class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink/55 via-ink/15 to-transparent" />
+        <div class="shell absolute inset-x-0 bottom-0 pb-12 lg:pb-16">
+          <div class="reveal max-w-measure-lg">
+            <p class="flex items-center gap-3 font-sans text-meta uppercase tracking-eyebrow text-paper/80">
+              {index && <span class="tabular-nums">{index}</span>}
+              <span class="h-px w-10 bg-paper/50" />
+              <span>{eyebrow}</span>
+            </p>
+            <h1 class="mt-5 text-display-lg text-paper">{title}</h1>
+          </div>
+        </div>
+      </div>
+      {lede && (
+        <div class="shell">
+          <p class="reveal max-w-measure-lg border-l border-bordeaux py-10 pl-6 text-lede text-ink-muted lg:py-14">
+            {lede}
+          </p>
+        </div>
+      )}
+    </section>
+  ) : (
+    <section class="border-b border-ink-line">
+      <div class="shell pb-16 pt-28 lg:pb-24 lg:pt-40">
+        <div class="reveal max-w-measure-lg">
+          <p class="flex items-center gap-3 font-sans text-meta uppercase tracking-eyebrow text-ink-soft">
+            {index && <span class="tabular-nums text-bordeaux">{index}</span>}
+            <span class="h-px w-10 bg-ink-line" />
+            <span>{eyebrow}</span>
+          </p>
+          <h1 class="mt-6 text-display-xl text-ink">{title}</h1>
+          {lede && <p class="mt-8 max-w-measure text-lede text-ink-muted">{lede}</p>}
+        </div>
+      </div>
+    </section>
+  )
+}
